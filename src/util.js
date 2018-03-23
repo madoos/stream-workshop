@@ -9,7 +9,7 @@ module.exports = {
   generatorToStream,
   generatorInstanceToStream,
   mapStream,
-  _await,
+  toAsync,
   lazyTake: R.curry(lazyTake),
   delayStream: R.curry(delayStream),
   take: R.pipe(
@@ -17,7 +17,7 @@ module.exports = {
     R.curry
   )(take),
   toPromise: R.curry(toPromise),
-  debug: R.curry(debug)
+  debug
 }
 
 function generatorToStream (genFn) {
@@ -57,7 +57,7 @@ function mapStream (fn) {
   })
 }
 
-function _await (fn, time) {
+function toAsync (fn, time) {
   return function (...args) {
     return toPromise(time, fn(...args))
   }
@@ -74,7 +74,7 @@ function lazyTake (genFn, n) {
 }
 
 function delayStream (ms, stream) {
-  return stream.pipe(mapStream(_await(R.identity, ms)))
+  return stream.pipe(mapStream(toAsync(R.identity, ms)))
 }
 
 function toPromise (time, data) {
@@ -82,6 +82,9 @@ function toPromise (time, data) {
 }
 
 function debug (tag, data) {
-  console.log(chalk.green(tag))
-  console.log(data)
+  let c = 1
+  return (data) => {
+    console.log(chalk.green(tag), chalk.yellow(c++))
+    console.log(data)
+  }
 }
