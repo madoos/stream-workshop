@@ -3,6 +3,7 @@
 const R = require('ramda')
 const { Readable, Transform } = require('stream')
 const take = require('take-generator')
+const chalk = require('chalk')
 
 module.exports = {
   generatorToStream,
@@ -15,7 +16,8 @@ module.exports = {
     R.flip,
     R.curry
   )(take),
-  toPromise: R.curry(toPromise)
+  toPromise: R.curry(toPromise),
+  debug: R.curry(debug)
 }
 
 function generatorToStream (genFn) {
@@ -57,10 +59,7 @@ function mapStream (fn) {
 
 function _await (fn, time) {
   return function (...args) {
-    return new Promise((resolve) => {
-      const data = fn(...args)
-      setTimeout(() => resolve(data), time)
-    })
+    return toPromise(time, fn(...args))
   }
 }
 
@@ -80,4 +79,9 @@ function delayStream (ms, stream) {
 
 function toPromise (time, data) {
   return new Promise((resolve) => setTimeout(() => resolve(data), time))
+}
+
+function debug (tag, data) {
+  console.log(chalk.green(tag))
+  console.log(data)
 }

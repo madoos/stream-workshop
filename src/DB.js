@@ -21,18 +21,29 @@ const findOneTo = (generatorFn, { ms }) => R.pipe(
                                               toPromise(ms)
                                             )
 
+const findAllTo = (generatorFn, { numItems = 1000, ms = 250 }) => R.pipe(
+                                                                      generatorFn,
+                                                                      take(numItems),
+                                                                      Array.from,
+                                                                      toPromise(ms)
+                                                                    )
+
 module.exports = (opt/* { ms, numItems} */) => ({
   User: {
-    findAllStream: findAllStreamTo(getUsers, opt),
-    findOne: findOneTo(getUsers, opt)
+    findAllStream: findAllStreamTo(getUsers, opt.user),
+    findOne: findOneTo(getUsers, opt.user),
+    findAll: findAllTo(getUsers, opt.user)
   },
   Post: {
-    findAllStream: findAllStreamTo(getPosts, opt),
-    findOne: findOneTo(getPosts, opt)
+    findAllStream: findAllStreamTo(getPosts, opt.post),
+    findOne: findOneTo(getPosts, opt.post),
+    findAll: findAllTo(getPosts, opt.post)
+
   },
   Tag: {
-    findAllStream: findAllStreamTo(getTags, opt),
-    findOne: findOneTo(getTags, opt)
+    findAllStream: findAllStreamTo(getTags, opt.tag),
+    findOne: findOneTo(getTags, opt.tag),
+    findAll: findAllTo(getTags, opt.tag)
   }
 })
 
